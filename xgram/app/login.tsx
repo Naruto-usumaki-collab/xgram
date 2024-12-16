@@ -160,4 +160,3 @@ const styles = StyleSheet.create({
   },
 });
 
-//mental riya kuthi company//
