@@ -53,9 +53,10 @@ export default function Photo() {
     Alert.alert('Profile Picture Set', 'Your profile picture has been updated.');
     router.push({
       pathname: '/homepage',
-      query: { profileImage: image }, // Pass the image URI as a query param
+      params: { profileImage: image }, // Use `params` to pass the image URI
     });
   };
+  
 
   return (
     <View style={styles.container}>
