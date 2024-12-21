@@ -34,7 +34,7 @@ export default function Login() {
       style={styles.container}
     >
       <View style={styles.formContainer}>
-        <Text style={styles.logo}>Instagram</Text>
+        <Text style={styles.logo}>Pundagram</Text>
 
         <TextInput
           style={styles.input}
