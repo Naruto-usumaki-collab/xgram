@@ -2,17 +2,21 @@ import React from "react";
 import { View, Text, StyleSheet, StatusBar, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useGlobalSearchParams } from "expo-router";
 
 export default function Homepage() {
   const router = useRouter();
-  const { profileImage } = router.query;
+  const { profileImage } = useGlobalSearchParams();
+
+  const imageUri = Array.isArray(profileImage) ? profileImage[0] : profileImage; // Ensure it's a single string
+
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000" translucent={true} />
 
       <View style={styles.header}>
-        <Text style={styles.headerText}>Instagram</Text>
+        <Text style={styles.headerText}>Koothigram</Text>
         <View style={styles.iconsContainer}>
           <TouchableOpacity>
             <Ionicons name="heart-outline" size={30} color="#fff" style={styles.icon} />
@@ -25,8 +29,8 @@ export default function Homepage() {
 
       <View style={styles.profileContainer}>
         <View style={styles.profileCircle}>
-          {profileImage ? (
-            <Image source={{ uri: profileImage }} style={styles.profileImage} />
+          {imageUri ? (
+            <Image source={{ uri: imageUri }} style={styles.profileImage} />
           ) : (
             <Ionicons name="person-outline" size={40} color="#fff" />
           )}
