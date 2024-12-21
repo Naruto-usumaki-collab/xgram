@@ -7,7 +7,7 @@ export default function DOB() {
   const [dob, setDob] = useState(new Date()); // Current date as default
   const [age, setAge] = useState(0); // Age calculated from DOB
   const [showDatePicker, setShowDatePicker] = useState(false); // Show or hide date picker
-  const router = useRouter();
+  const router = useRouter(); // Router instance for navigation
 
   // Function to calculate age based on selected date of birth
   const calculateAge = (birthDate: Date) => {
@@ -30,10 +30,10 @@ export default function DOB() {
   };
 
   const handleNext = () => {
-    if (dob) {
-      router.push("/Signup/phoneOremail"); // Navigate to next screen
+    if (age > 0) {
+      router.push("/Signup/phoneOremail"); // Navigate to the next screen
     } else {
-      Alert.alert("Error", "Please select your date of birth.");
+      Alert.alert("Error", "Please select a valid date of birth.");
     }
   };
 
