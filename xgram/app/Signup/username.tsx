@@ -7,27 +7,65 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import { useRouter } from "expo-router"; // For navigation
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { collection, doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../../configs/firebaseConfigs"; // Adjust path as needed
+import { useRouter } from "expo-router";
 
-export default function Username() {
+export default function Signup() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const router = useRouter();
 
-  const handleNext = () => {
-    if (username.trim()) {
-      router.push("../Signup/password"); // Navigate to the password screen
-    } else {
-      Alert.alert("Error", "Please enter a username.");
+  const handleSignup = async () => {
+    if (!email || !password || !username) {
+      Alert.alert("Error", "All fields are required!");
+      return;
     }
-  };
 
-  const handleBackToLogin = () => {
-    router.push("/login"); // Navigate back to the login page
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+  
+      // Save user details to Firestore
+      await setDoc(doc(collection(db, "UserDetails"), user.uid), {
+        username,
+        email,
+        createdAt: new Date(),
+      });
+  
+      Alert.alert("Success", "Account created successfully!");
+      router.push("/login"); // Navigate to login page
+    } catch (error) {
+      if (error instanceof Error) {
+        // Use error.message safely
+        Alert.alert("Signup Error", error.message);
+      } else {
+        // Handle unexpected error types
+        Alert.alert("Signup Error", "An unexpected error occurred.");
+      }
+    }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Enter Your Username</Text>
+      <Text style={styles.title}>Sign Up</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        placeholderTextColor="#888"
+        value={email}
+        onChangeText={setEmail}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        placeholderTextColor="#888"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+      />
       <TextInput
         style={styles.input}
         placeholder="Username"
@@ -35,11 +73,11 @@ export default function Username() {
         value={username}
         onChangeText={setUsername}
       />
-      <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-        <Text style={styles.nextButtonText}>Next</Text>
+      <TouchableOpacity  onPress={handleSignup}>
+        <Text>Sign Up</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={handleBackToLogin}>
-        <Text style={styles.backToLogin}>Back to Login</Text>
+      <TouchableOpacity onPress={() => router.push("/login")}>
+        <Text >Already have an account? Login</Text>
       </TouchableOpacity>
     </View>
   );
