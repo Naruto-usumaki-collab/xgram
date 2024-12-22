@@ -8,14 +8,25 @@ import {
   Alert,
 } from "react-native";
 import { useRouter } from "expo-router"; // For navigation
+import { db } from "../../configs/firebaseConfigs"; // Import Firestore instance
+import { collection, addDoc } from "firebase/firestore"; // Import Firestore functions
 
 export default function Username() {
   const [username, setUsername] = useState("");
   const router = useRouter();
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (username.trim()) {
-      router.push("../Signup/password"); // Navigate to the password screen
+      try {
+        // Save username to Firestore
+        const usersCollection = collection(db, "users"); // Replace "users" with your desired collection name
+        await addDoc(usersCollection, { username: username.trim() });
+
+        router.push("../Signup/password"); // Navigate to the password screen
+      } catch (error) {
+        console.error("Error saving username:", error);
+        Alert.alert("Error", "Failed to save username. Please try again.");
+      }
     } else {
       Alert.alert("Error", "Please enter a username.");
     }
@@ -44,6 +55,47 @@ export default function Username() {
     </View>
   );
 }
+
+// Add your styles here
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  input: {
+    width: "100%",
+    height: 40,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+  },
+  nextButton: {
+    width: "100%",
+    height: 40,
+    backgroundColor: "#007bff",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  nextButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  backToLogin: {
+    color: "#007bff",
+    textDecorationLine: "underline",
+  },
+});
 
 const styles = StyleSheet.create({
   container: {
