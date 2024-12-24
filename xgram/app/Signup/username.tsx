@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import {
   View,
-  Text,
   TextInput,
+  Text,
   TouchableOpacity,
   StyleSheet,
   Alert,
@@ -10,6 +10,7 @@ import {
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { collection, doc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../configs/firebaseConfigs"; // Adjust path as needed
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 
 export default function Signup() {
@@ -27,59 +28,65 @@ export default function Signup() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-  
+
       // Save user details to Firestore
       await setDoc(doc(collection(db, "UserDetails"), user.uid), {
         username,
         email,
         createdAt: new Date(),
       });
-  
+
       Alert.alert("Success", "Account created successfully!");
       router.push("/login"); // Navigate to login page
     } catch (error) {
       if (error instanceof Error) {
-        // Use error.message safely
         Alert.alert("Signup Error", error.message);
       } else {
-        // Handle unexpected error types
         Alert.alert("Signup Error", "An unexpected error occurred.");
       }
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        placeholderTextColor="#888"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        placeholderTextColor="#888"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Username"
-        placeholderTextColor="#888"
-        value={username}
-        onChangeText={setUsername}
-      />
-      <TouchableOpacity  onPress={handleSignup}>
-        <Text>Sign Up</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => router.push("/login")}>
-        <Text >Already have an account? Login</Text>
-      </TouchableOpacity>
-    </View>
+    <LinearGradient
+      colors={["#000000", "#1c1c1c"]} // Dark theme gradient
+      style={styles.container}
+    >
+      <View style={styles.formContainer}>
+        <Text style={styles.logo}>X-Gram</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#888"
+          value={email}
+          onChangeText={setEmail}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          placeholderTextColor="#888"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Username"
+          placeholderTextColor="#888"
+          value={username}
+          onChangeText={setUsername}
+        />
+
+        <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
+          <Text style={styles.signupButtonText}>Sign Up</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => router.push("/login")}>
+          <Text style={styles.backToLogin}>Already have an account? Log In</Text>
+        </TouchableOpacity>
+      </View>
+    </LinearGradient>
   );
 }
 
@@ -88,29 +95,33 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#1c1c1c", // Dark theme background
     padding: 20,
   },
-  title: {
-    fontSize: 24,
+  formContainer: {
+    width: "100%",
+    maxWidth: 400,
+    padding: 20,
+    backgroundColor: "#00000090",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  logo: {
+    fontSize: 36,
     fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 20,
+    color: "#ffffff",
+    marginBottom: 40,
   },
   input: {
     width: "100%",
-    maxWidth: 400,
     height: 50,
     backgroundColor: "#333",
+    color: "#fff",
     borderRadius: 25,
     paddingLeft: 20,
-    color: "#fff",
-    marginBottom: 20,
-    fontSize: 16,
+    marginBottom: 15,
   },
-  nextButton: {
+  signupButton: {
     width: "100%",
-    maxWidth: 400,
     height: 50,
     backgroundColor: "#3897f0",
     borderRadius: 25,
@@ -118,7 +129,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 15,
   },
-  nextButtonText: {
+  signupButtonText: {
     color: "#fff",
     fontWeight: "bold",
     fontSize: 18,
