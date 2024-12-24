@@ -7,69 +7,40 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { collection, doc, setDoc } from "firebase/firestore";
-import { auth, db } from "../../configs/firebaseConfigs"; // Adjust path as needed
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { useSignup } from "../../configs/SignupContext"; // Import the context
 
-export default function Signup() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
+// Define the type of your signupData
+interface SignupData {
+  username?: string;
+  password?: string;
+  dob?: string;
+  phoneOrEmail?: string;
+}
+
+export default function SignupUsername() {
+  const { signupData, setSignupData } = useSignup(); // Access context
+  const [username, setUsername] = useState(signupData.username || ""); // Pre-fill if returning
   const router = useRouter();
 
-  const handleSignup = async () => {
-    if (!email || !password || !username) {
-      Alert.alert("Error", "All fields are required!");
+  const handleNext = () => {
+    if (!username) {
+      Alert.alert("Error", "Please enter your username!");
       return;
     }
-
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      // Save user details to Firestore
-      await setDoc(doc(collection(db, "UserDetails"), user.uid), {
-        username,
-        email,
-        createdAt: new Date(),
-      });
-
-      Alert.alert("Success", "Account created successfully!");
-      router.push("/login"); // Navigate to login page
-    } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert("Signup Error", error.message);
-      } else {
-        Alert.alert("Signup Error", "An unexpected error occurred.");
-      }
-    }
+    // Save username to context
+    setSignupData((prev: SignupData) => ({ ...prev, username })); // Provide the type for prev
+    router.push("/Signup/password");
   };
 
   return (
     <LinearGradient
-      colors={["#000000", "#1c1c1c"]} // Dark theme gradient
+      colors={["#000000", "#1c1c1c"]}
       style={styles.container}
     >
       <View style={styles.formContainer}>
         <Text style={styles.logo}>X-Gram</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#888"
-          value={email}
-          onChangeText={setEmail}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor="#888"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
         <TextInput
           style={styles.input}
           placeholder="Username"
@@ -77,11 +48,9 @@ export default function Signup() {
           value={username}
           onChangeText={setUsername}
         />
-
-        <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
-          <Text style={styles.signupButtonText}>Sign Up</Text>
+        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+          <Text style={styles.nextButtonText}>Next</Text>
         </TouchableOpacity>
-
         <TouchableOpacity onPress={() => router.push("/login")}>
           <Text style={styles.backToLogin}>Already have an account? Log In</Text>
         </TouchableOpacity>
@@ -120,7 +89,7 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     marginBottom: 15,
   },
-  signupButton: {
+  nextButton: {
     width: "100%",
     height: 50,
     backgroundColor: "#3897f0",
@@ -129,7 +98,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 15,
   },
-  signupButtonText: {
+  nextButtonText: {
     color: "#fff",
     fontWeight: "bold",
     fontSize: 18,

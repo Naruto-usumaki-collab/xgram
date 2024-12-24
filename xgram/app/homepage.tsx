@@ -16,7 +16,7 @@ export default function Homepage() {
       <StatusBar barStyle="light-content" backgroundColor="#000" translucent={true} />
 
       <View style={styles.header}>
-        <Text style={styles.headerText}>Koothigram</Text>
+        <Text style={styles.headerText}>XGram</Text>
         <View style={styles.iconsContainer}>
           <TouchableOpacity>
             <Ionicons name="heart-outline" size={30} color="#fff" style={styles.icon} />

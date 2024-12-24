@@ -2,15 +2,15 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useRouter } from "expo-router"; // For navigation
 import DateTimePicker from "@react-native-community/datetimepicker"; // Date picker component
+import { useSignup } from "../../configs/SignupContext"; // Import the Signup context
 
 export default function DOB() {
-  const [dob, setDob] = useState(new Date()); // Current date as default
-  const [age, setAge] = useState(0); // Age calculated from DOB
+  const { signupData, setSignupData } = useSignup(); // Access the signupData from context
   const [showDatePicker, setShowDatePicker] = useState(false); // Show or hide date picker
   const router = useRouter(); // Router instance for navigation
 
   // Function to calculate age based on selected date of birth
-  const calculateAge = (birthDate: Date) => {
+  const calculateAge = (birthDate) => {
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const m = today.getMonth() - birthDate.getMonth();
@@ -18,19 +18,22 @@ export default function DOB() {
     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-    setAge(age); // Update the state with calculated age
+    setSignupData((prevData) => ({ ...prevData, age })); // Update age in the context
   };
 
   // Handle date selection
-  const handleDateChange = (event: any, selectedDate?: Date) => {
-    const currentDate = selectedDate || dob;
+  const handleDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || signupData.dob;
     setShowDatePicker(false); // Hide the date picker once date is selected
-    setDob(currentDate); // Update DOB state
+    setSignupData((prevData) => ({
+      ...prevData,
+      dob: currentDate, // Update dob in the context
+    }));
     calculateAge(currentDate); // Calculate and update age
   };
 
   const handleNext = () => {
-    if (age > 0) {
+    if (signupData.age > 0) {
       router.push("/Signup/phoneOremail"); // Navigate to the next screen
     } else {
       Alert.alert("Error", "Please select a valid date of birth.");
@@ -46,13 +49,15 @@ export default function DOB() {
       <Text style={styles.title}>Enter Your Date of Birth</Text>
       <TouchableOpacity onPress={() => setShowDatePicker(true)}>
         <Text style={styles.dateText}>
-          {dob.toLocaleDateString()} {/* Format the date to "MM/DD/YYYY" */}
+          {signupData.dob instanceof Date
+            ? signupData.dob.toLocaleDateString() // Ensure dob is a Date object before calling toLocaleDateString
+            : "Invalid Date"}
         </Text>
       </TouchableOpacity>
 
       {showDatePicker && (
         <DateTimePicker
-          value={dob}
+          value={signupData.dob}
           mode="date"
           display="spinner"
           onChange={handleDateChange}
@@ -60,7 +65,7 @@ export default function DOB() {
       )}
 
       <Text style={styles.ageText}>
-        {age > 0 ? `${age} years old` : "Please select your birthdate"}
+        {signupData.age > 0 ? `${signupData.age} years old` : "Please select your birthdate"}
       </Text>
 
       <TouchableOpacity style={styles.nextButton} onPress={handleNext}>

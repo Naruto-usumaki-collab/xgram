@@ -1,13 +1,20 @@
+// password.tsx
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { useRouter } from "expo-router"; // For navigation
+import { useRouter } from "expo-router";
+import { useSignup } from "../../configs/SignupContext"; // Import the context
+import { SignupData } from "../../configs/types"; // Import the SignupData type
 
 export default function Password() {
-  const [password, setPassword] = useState("");
+  const { signupData, setSignupData } = useSignup(); // Access context
+  const [password, setPassword] = useState(signupData.password || ""); // Pre-fill if returning
   const router = useRouter();
 
   const handleNext = () => {
     if (password.trim()) {
+      // Save the password to context
+      setSignupData((prev: SignupData) => ({ ...prev, password }));
+      
       router.push("../Signup/DOB"); // Navigate to the DOB screen
     } else {
       Alert.alert("Error", "Please enter a password.");
