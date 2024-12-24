@@ -1,11 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
+import { useSignup } from "../../configs/SignupContext"; // Import the useSignup hook
 
 export default function PhoneOrEmail() {
+  const { signupData, setSignupData } = useSignup(); // Access the context
   const [inputType, setInputType] = useState<"phone" | "email">("phone");
   const [inputValue, setInputValue] = useState("");
   const router = useRouter(); // Use router for navigation
+
+  // Update the context when the inputValue changes
+  useEffect(() => {
+    if (inputType === "phone") {
+      setSignupData({ ...signupData, phoneOrEmail: inputValue }); // Update phoneOrEmail in the context
+    } else {
+      setSignupData({ ...signupData, phoneOrEmail: inputValue }); // Update phoneOrEmail for email as well
+    }
+  }, [inputValue, inputType, setSignupData, signupData]); // Run effect when inputValue or inputType changes
 
   return (
     <View style={styles.container}>
@@ -45,7 +56,10 @@ export default function PhoneOrEmail() {
       />
       <TouchableOpacity
         style={styles.nextButton}
-        onPress={() => router.push("/Signup/access")} // Navigate to Signup/access
+        onPress={() => {
+          console.log(signupData); // Log the signupData
+          router.push("/Signup/access"); // Navigate to Signup/access
+        }}
       >
         <Text style={styles.nextButtonText}>Next</Text>
       </TouchableOpacity>
